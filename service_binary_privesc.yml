@@ -1,0 +1,29 @@
+# Abused service modification privileges to achieve System privileges.
+# Required fields
+# - EventID
+# - Image
+# - CommandLine
+title: Service Binary Privesc
+id: 3b9869a7-9a89-468d-840f-bd8030ad90f3
+status: experimental
+description: Détecte la modification d'un service
+author: Étienne Lacroix
+date: 2023/07/29
+references:
+    - https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1543.003/T1543.003.md
+tags:
+    - attack.privilege_escalation
+    - attack.t1543.003
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 1
+        Image|endswith: sc.exe
+        CommandLine|contains|all:
+            -  ' config '
+            -  ' binPath= '
+    condition: selection
+falsepositives: Une modification de service n'est pas nécessairement malicieuse
+level: low

@@ -1,0 +1,43 @@
+# Execution of Certutil tool to download Netcat binary.
+# Required fields
+# - EventID
+# - Image
+# - CommandLine
+title: Certutil_file_ingress
+id: e023a7c0-b487-4e54-9b7d-677a7363e094
+status: experimental
+description: |
+    Permet la détection du téléchargement d'un binaire (Netcat dans ce cas) malicieux via l'outil certutil.
+author: Étienne Lacroix
+date: 2023/07/29
+modified: 2023/07/29
+references:
+    - https://tryhackme.com/room/sighunt
+    - https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/certutil # Qu'est-ce que certutil
+    - https://www.ired.team/offensive-security/defense-evasion/downloading-file-with-certutil # Comment peut-il être utilisé malicieusement?
+tags:
+    - attack.command_and_control
+    - attack.t1105
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 1
+        Image|endswith: certutil.exe
+        CommandLine|contains|all:
+            - -urlcache # Displays or deletes URL cache entries.
+            - -f # Force overwrite.
+            - -split # Split embedded ASN.1 elements, and save to files.
+            #- C:\Users\\*\AppData\Local\Temp\ # Pour surveiller un chemin précis
+            #- huntmeplz.com # Pour surveiller un domaine précis
+        # ParentCommandLine|contains: # Pourquoi un usager effecturait téléchargement de cette facon?
+        #    - cmd.exe
+        #    - powershell.exe
+    condition: selection
+fields:
+    - EventID
+    - Image
+    - CommandLine
+falsepositives: TBD
+level: high # Il faudrait valider le domaine

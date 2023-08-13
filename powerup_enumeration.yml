@@ -1,0 +1,38 @@
+# Enumeration of privilege escalation vectors through PowerUp.ps1.
+# Required Fields
+# - EventID
+# - Image
+# - CommandLine
+title: Powerup Enumeration
+id: ed157114-a516-4923-a106-bdb8cca2e0d2
+status: experimental
+description: Détecte l'utilisation de l'outil PowerUp.ps1 pour l'enumeration de vecteurs d'élévation de privilèges.
+author: Étienne Lacroix
+date: 2023/07/29
+modified: 2023/07/29
+references:
+    - https://github.com/PowerShellMafia/PowerSploit/tree/master/Privesc
+tags:
+    - attack.discovery
+    - attack.t1087.001
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 1
+        Image|contains:
+            - '*\powershell.exe'
+            - '*\powershell_ise.exe'
+            - '*\pwsh.exe'
+            - '*\pwsh_ise.exe'
+        CommandLine|contains:
+            - Invoke-AllChecks
+            - PowerUp.ps1
+    condition: selection
+fields:
+    - EventID
+    - Image
+    - CommandLine
+falsepositives: Unknown
+level: critical

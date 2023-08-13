@@ -1,0 +1,44 @@
+# Execution of malicious HTA payload from a phishing link.
+# Reqiured fields
+# - EventID
+# - ParentImage
+# - Image
+title: Exécution malicieuse d'une fichier HTA
+id: 4d5e0a56-0091-48fc-90dc-1fbb2346b04a
+status: experimental
+description: |
+    Cette détection identifier l'exécution d'un fichier HTA malicieux.
+author: Étienne Lacroix
+date: 2023/07/28
+modified: 2023/07/28
+logsource:
+  product: windows
+  service: sysmon
+references:
+  - https://tryhackme.com/room/sighunt
+  - https://medium.com/@anht_59851/html-application-hta-a-gui-for-your-scripting-on-windows-bfaacf2c3bdd # Qu'est-ce qu'un fichier HTA?
+  - https://www.ired.team/offensive-security/code-execution/t1170-mshta-code-execution # Comment est-ce qu'un fichier HTA pourrait être utilisé pour exécuter du code malicieux?
+tags:
+    - attack.defense_evasion
+    - attack.t1218.005
+detection:
+  selection:
+    EventID: 1 # Process creation event
+    ParentImage|endswith:
+        - 'chrome.exe'
+        - 'firefox.exe'
+        - 'internetexplorer.exe'
+    Image|endswith: 'mshta.exe'
+    # Si on avait voulu faire une détection précise pour le fichier update.hta
+    # CommandLine|contains:
+    #    - 'update.hta'
+  condition: selection #Action to be taken. Can use condition operators such as OR, AND, NOT, 
+fields: #List of associated fields that are important for the detection
+ - EventID
+ - ParentImage
+ - Image
+ - CommandLine
+falsepositives: |
+    Téléchargement d'une image légitime sous ce format par un usager sous ce format.
+    Potentiellement tous les fichiers hta utlisés par l'organisation.
+level: low

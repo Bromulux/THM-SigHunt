@@ -1,0 +1,31 @@
+# Collected sensitive data by archiving via 7-zip.
+# - EventID
+# - Image
+# - CommandLine
+title: 7z Suspicious Archive
+id: 82c3d052-0b32-4515-a7ac-2be74f88b8ff
+status: experimental
+description: Détecte la compresson massive de fichiers via 7-zip. L'archive sera par la suite exfiltrée par un attaquant.
+author: Étienne Lacroix
+date: 2023/07/29
+references: Aucune
+tags:
+    - attack.collection
+    - attack.t1560.001
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 1
+        Image|endswith: 7z.exe
+        CommandLine|contains|all:
+            - '-p' # création d'une archive protégée par mot de passe.
+            - ' a ' # ajout au 7zip
+    condition: selection
+fields:
+    - EventID
+    - Image
+    - CommandLine
+falsepositives: Aucun connu
+level: high

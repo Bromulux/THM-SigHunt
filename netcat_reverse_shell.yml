@@ -1,0 +1,36 @@
+# Netcat execution to establish a reverse shell.
+# Required fields
+# - EventID
+# - Image
+# - CommandLine
+# - Hashes
+title: netcat reverse shell
+id: b0724483-8fd8-42f5-8c92-d1e364f764d6
+status: experimental
+description: Détecte l'exécution d'un reverse shell par le binaire Netcat.
+author: Étienne Lacroix
+date: 2023/07/29
+references:
+    - https://www.infosecademy.com/netcat-reverse-shells/
+tags:
+    - attack.command_and_control
+    - attack.t1071.001
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    reverse_shell:
+        EventID: 1
+        Image|endswith: nc.exe
+        CommandLine|contains: -e # inbound program to execute
+    generic_execution: # To catch other ways to do reverse shell with netcat
+        Hashes|contains:
+            - SHA256=3E59379F585EBF0BECB6B4E06D0FBBF806DE28A4BB256E837B4555F1B4245571
+    condition: reverse_shell OR generic_execution
+fields:
+    - EventID
+    - Image
+    - CommandLine
+    - Hashes
+falsepositives: Tests réseau d'un administrateur.
+level: critical

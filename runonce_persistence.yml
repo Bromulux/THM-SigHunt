@@ -1,0 +1,33 @@
+# Required fields
+# - EventID
+# - Image
+# - CommandLine
+title: Runonce Persistence
+id: c54fbaaa-ebae-4c18-a17a-67bcf804ceee
+status: experimental
+description: Détecte l'ajout d'une clé de registre RunOnce, synonyme d'une persistance.
+author: Étienne Lacroix
+date: 2023/07/29
+references:
+    - https://www.linode.com/docs/guides/windows-red-team-persistence-techniques/#persistence-through-windows-registry
+tags:
+    - attack.persistence
+    - attack.t1060
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 1
+        Image|endswith: reg.exe
+        CommandLine|contains|all:
+            - ' add '
+            - 'RunOnce'
+    condition: selection
+fields:
+    - EventID
+    - Image
+    - CommandLine
+falsepositives:
+     - Unknown
+level: high
